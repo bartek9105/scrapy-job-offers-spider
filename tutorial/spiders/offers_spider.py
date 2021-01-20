@@ -1,25 +1,23 @@
 import scrapy
 
-class QuotesSpider(scrapy.Spider):
-    name = 'offers'
+class OffersSpider(scrapy.Spider):
+  name = "offers"
 
-    def start_requests(self):
-        urls = ['https://stackoverflow.com/jobs']
-        for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse)       
+  start_urls = ["https://stackoverflow.com/jobs"]
 
-    def parse(self, response):
-        results = {}
-        offers = response.css('div.listResults a.post-tag::text').getall()
+  def parse(self, response):
+    for offer in response.css('div.-job'):
+      yield {
+        'technology': offer.css('a.post-tag::text').getall()
+      }
+    pages = response.css('a.s-pagination--item::attr(title)').getall()
+    next_page_href = response.css('a.s-pagination--item::attr(href)').getall()
 
-        next_page = response.css('div.s-pagination a.s-pagination--item:last-child::attr(href)').get()        
+    total_pages = pages[len(pages) - 2].split(' ')[3]
+    next_page = pages[len(pages) - 1].split(' ')[1]
 
-        if next_page is not None:
-            next_page = response.urljoin(next_page)
-            yield scrapy.Request(next_page, callback = self.parse)
+    next_page_link = 'https://stackoverflow.com' + next_page_href[len(next_page_href) - 1]
 
-        for offer in offers: 
-            if (offer in results):
-                results[offer] += 1
-            else:
-                results[offer] = 1
+    if int(next_page) <= int(total_pages):
+      next_page_add = response.urljoin(next_page_link)
+      yield scrapy.Request(next_page_add, callback =self.parse)
