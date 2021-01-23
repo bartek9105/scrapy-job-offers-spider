@@ -11,6 +11,7 @@ class OffersSpider(scrapy.Spider):
       item = OfferItem()
       item['technologies'] = offer.css('a.post-tag::text').getall()
       item['city'] = offer.css('h3 span::text').getall()[1]
+      item['salary'] = offer.css('.horizontal-list li::attr(title)').getall()
       yield item
     pages = response.css('a.s-pagination--item::attr(title)').getall()
     next_page_href = response.css('a.s-pagination--item::attr(href)').getall()

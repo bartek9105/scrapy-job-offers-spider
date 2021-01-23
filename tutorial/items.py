@@ -8,3 +8,4 @@ import scrapy
 class OfferItem(scrapy.Item):
     technologies = scrapy.Field()
     city = scrapy.Field()
+    salary = scrapy.Field()
