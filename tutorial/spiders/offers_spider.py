@@ -1,4 +1,5 @@
 import scrapy
+from tutorial.items import OfferItem
 
 class OffersSpider(scrapy.Spider):
   name = "offers"
@@ -7,9 +8,10 @@ class OffersSpider(scrapy.Spider):
 
   def parse(self, response):
     for offer in response.css('div.-job'):
-      yield {
-        'technology': offer.css('a.post-tag::text').getall()
-      }
+      item = OfferItem()
+      item['technologies'] = offer.css('a.post-tag::text').getall()
+      item['city'] = offer.css('h3 span::text').getall()[1]
+      yield item
     pages = response.css('a.s-pagination--item::attr(title)').getall()
     next_page_href = response.css('a.s-pagination--item::attr(href)').getall()
 
