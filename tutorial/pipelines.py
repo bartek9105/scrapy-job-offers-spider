@@ -31,7 +31,7 @@ class MongoPipeline(object):
     def close_spider(self, spider):
         ## clean up when spider is closed
         data = self.client['scraper']
-        col = data['technologies']
+        col = data['offers']
 
         new_field = col.insert_one({"offers": [], "created_at": datetime.now()})
 
